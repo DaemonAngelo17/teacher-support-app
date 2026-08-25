@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduCore Hub - Teacher Support Workspace</title>
+  <meta name="description" content="A comprehensive academic review portal for teachers. Search and filter topics from Grade 1 to 12 in Science, Math, Social Studies, English, and Filipino, with curated resources and teaching aids.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Theme Script (Prevent Flash of Unstyled Content) -->
+  <script>
+    const savedTheme = localStorage.getItem('educore-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+
+  <!-- APP CONTAINER -->
+  <div class="app-grid">
+    
+    <!-- --- HEADER --- -->
+    <header class="app-header glass-panel">
+      <div class="header-logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+            <path d="M13 14h3"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>EduCore Hub</h1>
+          <span>Teacher Resource Workspace</span>
+        </div>
+      </div>
+      
+      <div class="header-controls">
+        <!-- Quick stats summary -->
+        <div class="quick-stats hide-mobile">
+          <div class="stat-pill" title="Total subjects supported">
+            <span class="stat-number">5</span>
+            <span class="stat-label">Subjects</span>
+          </div>
+          <div class="stat-pill" title="Total grade levels">
+            <span class="stat-number">12</span>
+            <span class="stat-label">Grades</span>
+          </div>
+        </div>
+
+        <!-- Add Topic Button -->
+        <button id="add-topic-btn" class="primary-btn" title="Add a New Topic" style="padding: 8px 14px; font-size: 0.85rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span class="hide-mobile">Add Topic</span>
+        </button>
+
+        <!-- Reset/Sync Database Button -->
+        <button id="reset-curriculum-header-btn" class="text-btn outline-btn" title="Reset back to default K-12 topics" style="padding: 6px 10px; font-size: 0.75rem;">
+          Sync Database
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle light and dark theme" title="Toggle Light/Dark Theme">
+          <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- --- SIDEBAR / FILTER PANEL --- -->
+    <aside class="sidebar-panel glass-panel">
+      <div class="sidebar-section">
+        <div class="section-title">
+          <h3>Filter by Subject</h3>
+          <button id="clear-subjects" class="text-btn">Clear</button>
+        </div>
+        <div class="subject-pill-group" id="subject-filters">
+          <!-- Science Pill -->
+          <button class="filter-pill subject-pill" data-subject="science">
+            <span class="dot sci"></span>
+            Science
+          </button>
+          <!-- Math Pill -->
+          <button class="filter-pill subject-pill" data-subject="math">
+            <span class="dot math"></span>
+            Math
+          </button>
+          <!-- Social Studies Pill -->
+          <button class="filter-pill subject-pill" data-subject="social">
+            <span class="dot social"></span>
+            Social Studies
+          </button>
+          <!-- English Pill -->
+          <button class="filter-pill subject-pill" data-subject="english">
+            <span class="dot eng"></span>
+            English
+          </button>
+          <!-- Filipino Pill -->
+          <button class="filter-pill subject-pill" data-subject="filipino">
+            <span class="dot fil"></span>
+            Filipino
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">
+          <h3>Filter by Grade</h3>
+          <button id="clear-grades" class="text-btn">Clear</button>
+        </div>
+        <div class="grade-grid" id="grade-filters">
+          <button class="filter-pill grade-pill" data-grade="1">G1</button>
+          <button class="filter-pill grade-pill" data-grade="2">G2</button>
+          <button class="filter-pill grade-pill" data-grade="3">G3</button>
+          <button class="filter-pill grade-pill" data-grade="4">G4</button>
+          <button class="filter-pill grade-pill" data-grade="5">G5</button>
+          <button class="filter-pill grade-pill" data-grade="6">G6</button>
+          <button class="filter-pill grade-pill" data-grade="7">G7</button>
+          <button class="filter-pill grade-pill" data-grade="8">G8</button>
+          <button class="filter-pill grade-pill" data-grade="9">G9</button>
+          <button class="filter-pill grade-pill" data-grade="10">G10</button>
+          <button class="filter-pill grade-pill" data-grade="11">G11</button>
+          <button class="filter-pill grade-pill" data-grade="12">G12</button>
+        </div>
+      </div>
+
+      <div class="sidebar-footer hide-mobile">
+        <p>Curriculum coverage: Grades 1 - 12 (Elementary, Junior High, Senior High)</p>
+        <button id="reset-curriculum-btn" class="text-btn outline-btn" style="margin-top: 12px; width: 100%; text-align: center; font-size: 0.75rem;" title="Reset back to default K-12 topics">Reset Curriculum</button>
+      </div>
+    </aside>
+
+    <!-- --- MAIN CONTENT AREA --- -->
+    <main class="main-content">
+      
+      <!-- Search & Quick Filters Header -->
+      <section class="search-section glass-panel">
+        <div class="search-input-wrapper">
+          <div class="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input type="text" id="search-box" placeholder="Search topics, keywords, learning objectives..." autocomplete="off">
+          <button id="clear-search" class="clear-search-btn" title="Clear Search" style="display: none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Filter info bar -->
+        <div class="filter-status-bar">
+          <div class="status-summary" id="results-count">
+            Showing all topics...
+          </div>
+          <div class="active-badge-list" id="active-badges">
+            <!-- Active filter badges generated by JS -->
+          </div>
+          <button id="reset-all" class="text-btn outline-btn" style="display: none;">Reset All</button>
+        </div>
+      </section>
+
+      <!-- Topics Grid -->
+      <section class="topics-grid-section">
+        <div class="topics-grid" id="topics-container">
+          <!-- Rendered dynamically by JS -->
+        </div>
+
+        <!-- Empty state placeholder -->
+        <div class="empty-state" id="empty-state-view" style="display: none;">
+          <div class="empty-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+          </div>
+          <h3>No topics match your search or filters</h3>
+          <p>Try adjusting your grade level, subject selection, or typing a different keyword.</p>
+          <button id="empty-reset-btn" class="primary-btn">Reset All Filters</button>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- --- TOPIC DETAIL MODAL / DRAWER --- -->
+  <div class="modal-overlay" id="detail-modal" aria-hidden="true">
+    <div class="modal-container glass-panel" role="dialog" aria-labelledby="modal-topic-title">
+      
+      <!-- Modal Header -->
+      <div class="modal-header" id="modal-header-banner">
+        <div class="header-meta">
+          <span class="badge" id="modal-subject-badge">Science</span>
+          <span class="badge" id="modal-grade-badge">Grade 10</span>
+        </div>
+        <div class="modal-header-actions" style="display: flex; gap: 8px;">
+          <button id="edit-topic-btn" class="btn-icon" aria-label="Edit topic details" title="Edit Topic">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button id="close-modal" class="btn-icon close-btn" aria-label="Close details">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Scrollable Content -->
+      <div class="modal-body">
+        <h2 id="modal-topic-title">Topic Title</h2>
+        <p class="topic-description" id="modal-topic-description">Brief description of the lesson objectives and what teachers should discuss.</p>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="concepts-resources">Curriculum & Resources</button>
+          <button class="tab-btn" data-tab="review-tool">Classroom Review Tool</button>
+          <button class="tab-btn" data-tab="teacher-notes">My Workspace</button>
+        </div>
+
+        <!-- TAB CONTENT 1: Curriculum & Resources -->
+        <div class="tab-pane active" id="tab-concepts-resources">
+          <div class="concepts-section">
+            <h3>Key Learning Concepts</h3>
+            <ul class="concept-list" id="modal-concept-list">
+              <!-- Rendered dynamically -->
+            </ul>
+          </div>
+
+          <div class="resources-section">
+            <h3>Curated Teaching Resources</h3>
+            <p class="section-subtitle">Click the links below to access media, worksheets, and interactive elements for lessons.</p>
+            <div class="resources-list" id="modal-resources-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 2: Classroom Review Tool -->
+        <div class="tab-pane" id="tab-review-tool">
+          <div class="teaching-tool-header">
+            <h3>Interactive Classroom Q&A</h3>
+            <p>Use these review items to check students' understanding on the board. Toggle between flashcard and quiz mode.</p>
+            
+            <div class="tool-mode-selector">
+              <button class="btn-pill active" id="btn-mode-flashcards">Flashcards</button>
+              <button class="btn-pill" id="btn-mode-quiz">Quick Quiz</button>
+            </div>
+          </div>
+
+          <!-- Interactive Area -->
+          <div class="review-tool-container">
+            
+            <!-- FLASHCARD INTERACTIVE VIEW -->
+            <div class="interactive-view" id="view-flashcards">
+              <div class="flashcard-deck">
+                <div class="flashcard glass-panel" id="flashcard-element">
+                  <div class="flashcard-inner">
+                    <div class="card-face card-front">
+                      <div class="card-header">Question <span id="flashcard-num">1</span></div>
+                      <p class="card-text" id="flashcard-q-text">What is the question?</p>
+                      <span class="card-prompt">Click Card to Flip</span>
+                    </div>
+                    <div class="card-face card-back">
+                      <div class="card-header">Answer</div>
+                      <p class="card-text" id="flashcard-a-text">This is the answer.</p>
+                      <span class="card-prompt">Click Card to Flip Back</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="deck-controls">
+                <button class="primary-btn outline-btn" id="prev-card-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  Previous
+                </button>
+                <span class="deck-indicator"><span id="curr-card-index">1</span> / <span id="total-card-count">3</span></span>
+                <button class="primary-btn outline-btn" id="next-card-btn">
+                  Next
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- QUIZ INTERACTIVE VIEW -->
+            <div class="interactive-view" id="view-quiz" style="display: none;">
+              <div class="quiz-question-card glass-panel">
+                <div class="quiz-progress-bar">
+                  <div class="quiz-progress" id="quiz-progress-indicator" style="width: 33%"></div>
+                </div>
+                <div class="quiz-question-header">
+                  <span>Question <span id="quiz-curr-q-num">1</span> of <span id="quiz-total-q-count">3</span></span>
+                  <span class="quiz-score" id="quiz-score-display">Score: 0</span>
+                </div>
+                <p class="quiz-question-text" id="quiz-question-text-el">This is a quiz question?</p>
+                
+                <!-- Reveal answer container -->
+                <div class="quiz-answer-container" id="quiz-answer-block" style="display: none;">
+                  <div class="answer-badge">Correct Answer</div>
+                  <p class="quiz-answer-text" id="quiz-answer-text-el">This is the correct answer.</p>
+                  
+                  <div class="quiz-verdict-btns">
+                    <button class="primary-btn feedback-correct" id="quiz-btn-correct">Student Got it Right (+1)</button>
+                    <button class="primary-btn outline-btn feedback-incorrect" id="quiz-btn-incorrect">Missed It</button>
+                  </div>
+                </div>
+
+                <div class="quiz-actions">
+                  <button class="primary-btn" id="quiz-btn-reveal">Reveal Answer</button>
+                  <button class="primary-btn" id="quiz-btn-next" style="display: none;">Next Question</button>
+                </div>
+              </div>
+
+              <!-- Quiz Complete State -->
+              <div class="quiz-complete-card glass-panel" id="quiz-complete-block" style="display: none;">
+                <div class="complete-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <h3>Quiz Completed!</h3>
+                <p>Nice work reviewing this topic with your class.</p>
+                <div class="complete-score">Final Class Score: <strong id="quiz-final-score">0</strong> / <span id="quiz-max-score">3</span></div>
+                <button class="primary-btn" id="quiz-btn-restart">Restart Quiz</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 3: Teacher Workspace -->
+        <div class="tab-pane" id="tab-teacher-notes">
+          <div class="notes-container">
+            <div class="notes-header">
+              <h3>Private Teaching Notes</h3>
+              <span class="save-status" id="notes-save-status">Saved</span>
+            </div>
+            <p class="section-subtitle">Jot down lesson plans, teaching strategies, or classroom reminders. Saved automatically.</p>
+            <textarea id="teacher-notes-input" placeholder="Type your teaching notes here... (e.g., 'Discuss states of matter on Tuesday. Remind students to bring water bottles for the evaporation experiment.')"></textarea>
+          </div>
+
+          <div class="custom-links-container">
+            <h3>Add Custom Resources</h3>
+            <p class="section-subtitle">Link your own slides, files, or reference sites for quick access during discussion.</p>
+            
+            <!-- Link Adder Form -->
+            <form id="custom-link-form" class="custom-link-form">
+              <div class="form-row">
+                <input type="text" id="custom-link-label" placeholder="Resource Label (e.g., Google Slides)" required autocomplete="off">
+                <input type="url" id="custom-link-url" placeholder="URL (https://...)" required autocomplete="off">
+                <button type="submit" class="primary-btn">Add Link</button>
+              </div>
+            </form>
+
+            <!-- Custom Links list -->
+            <div class="custom-links-list" id="custom-links-list-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- --- ADD/EDIT TOPIC FORM MODAL --- -->
+  <div class="modal-overlay" id="form-modal" aria-hidden="true">
+    <div class="modal-container glass-panel" style="max-width: 600px; max-height: 90vh;" role="dialog" aria-labelledby="form-modal-title">
+      <!-- Form Header -->
+      <div class="modal-header">
+        <h2 id="form-modal-title" style="font-size: 1.5rem; letter-spacing: -0.01em;">Add New Topic</h2>
+        <button id="close-form-modal" class="btn-icon close-btn" aria-label="Close form">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form Content -->
+      <form id="topic-editor-form" style="display: flex; flex-direction: column; overflow: hidden; height: 100%;">
+        <div class="modal-body" style="overflow-y: auto;">
+          
+          <!-- Title -->
+          <div class="form-group">
+            <label for="form-topic-title">Topic Title</label>
+            <input type="text" id="form-topic-title" required placeholder="e.g., Photosynthesis & Cellular Respiration" autocomplete="off">
+          </div>
+
+          <!-- Subject & Grade Row -->
+          <div class="form-grid-row">
+            <div class="form-group">
+              <label for="form-topic-subject">Subject</label>
+              <select id="form-topic-subject" required>
+                <option value="" disabled selected>Select Subject</option>
+                <option value="science">Science</option>
+                <option value="math">Math</option>
+                <option value="social">Social Studies</option>
+                <option value="english">English</option>
+                <option value="filipino">Filipino</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="form-topic-grade">Grade Level</label>
+              <select id="form-topic-grade" required>
+                <option value="" disabled selected>Select Grade</option>
+                <option value="1">Grade 1</option>
+                <option value="2">Grade 2</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+                <option value="7">Grade 7</option>
+                <option value="8">Grade 8</option>
+                <option value="9">Grade 9</option>
+                <option value="10">Grade 10</option>
+                <option value="11">Grade 11</option>
+                <option value="12">Grade 12</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="form-topic-description">Description / Objectives</label>
+            <textarea id="form-topic-description" required placeholder="Describe the objectives of this topic..." style="height: 80px;"></textarea>
+          </div>
+
+          <!-- Core Concepts -->
+          <div class="form-group">
+            <label for="form-topic-concepts">Core Concepts (One per line)</label>
+            <textarea id="form-topic-concepts" required placeholder="Enter key facts, definitions or concepts. Put each on a new line." style="height: 100px;"></textarea>
+          </div>
+
+          <!-- Curated Resources Section -->
+          <div class="form-section-divider"></div>
+          <div class="form-section-header">
+            <h4>Curated Resource Links</h4>
+            <button type="button" id="form-add-resource-btn" class="text-btn outline-btn" style="padding: 4px 10px; font-size: 0.75rem;">+ Add Link</button>
+          </div>
+          <div class="form-resources-list" id="form-resources-list">
+            <!-- Dynamically populated rows of: Type, Label, URL, Delete Button -->
+          </div>
+
+          <!-- Classroom Review Section -->
+          <div class="form-section-divider"></div>
+          <div class="form-section-header">
+            <h4>Classroom Review Q&As (Flashcards / Quiz)</h4>
+          </div>
+          
+          <div class="form-group-review">
+            <div class="review-item-form-row">
+              <span class="review-item-num">1</span>
+              <div class="review-item-inputs">
+                <input type="text" class="form-review-q" id="form-review-q1" placeholder="Question 1 (Optional)" autocomplete="off">
+                <input type="text" class="form-review-a" id="form-review-a1" placeholder="Answer 1 (Optional)" autocomplete="off">
+              </div>
+            </div>
+            <div class="review-item-form-row">
+              <span class="review-item-num">2</span>
+              <div class="review-item-inputs">
+                <input type="text" class="form-review-q" id="form-review-q2" placeholder="Question 2 (Optional)" autocomplete="off">
+                <input type="text" class="form-review-a" id="form-review-a2" placeholder="Answer 2 (Optional)" autocomplete="off">
+              </div>
+            </div>
+            <div class="review-item-form-row">
+              <span class="review-item-num">3</span>
+              <div class="review-item-inputs">
+                <input type="text" class="form-review-q" id="form-review-q3" placeholder="Question 3 (Optional)" autocomplete="off">
+                <input type="text" class="form-review-a" id="form-review-a3" placeholder="Answer 3 (Optional)" autocomplete="off">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Form Footer Actions -->
+        <div class="modal-footer" style="padding: 20px 32px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary);">
+          <button type="button" id="form-delete-btn" class="primary-btn" style="display: none; background-color: var(--danger-color); box-shadow: none; color: white;">Delete Topic</button>
+          <div style="display: flex; gap: 12px; margin-left: auto;">
+            <button type="button" id="close-form-btn" class="primary-btn outline-btn" style="padding: 10px 20px;">Cancel</button>
+            <button type="submit" class="primary-btn" style="padding: 10px 20px;">Save Topic</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- --- CUSTOM CONFIRMATION MODAL --- -->
+  <div class="modal-overlay" id="confirm-modal" aria-hidden="true" style="display: none; z-index: 1100;">
+    <div class="modal-container glass-card" style="max-width: 440px; padding: 0; overflow: hidden; border-radius: 20px; box-shadow: var(--shadow-xl);">
+      <div style="padding: 28px 28px 20px; text-align: center;">
+        <div style="width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: var(--danger-color); display: flex; align-items: center; justify-content: center;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3 id="confirm-modal-title" style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Reset Curriculum Database?</h3>
+        <p id="confirm-modal-message" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">This will reset the active curriculum back to the full K-12 database.</p>
+      </div>
+      <div style="padding: 16px 28px 24px; background: var(--bg-primary); display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--border-color);">
+        <button type="button" id="confirm-cancel-btn" class="primary-btn outline-btn" style="padding: 10px 18px; font-size: 0.85rem;">Cancel</button>
+        <button type="button" id="confirm-action-btn" class="primary-btn" style="padding: 10px 18px; font-size: 0.85rem; background: var(--danger-color); border-color: var(--danger-color); color: white;">Reset Database</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Curriculum Database and App scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
