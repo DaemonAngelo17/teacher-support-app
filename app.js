@@ -681,12 +681,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   DOM.closeModalBtn.addEventListener('click', closeModal);
 
+  function triggerGoogleTranslate(targetLang) {
+    try {
+      const select = document.querySelector('.goog-te-combo');
+      if (select) {
+        select.value = targetLang === 'fil' ? 'tl' : 'en';
+        select.dispatchEvent(new Event('change'));
+      }
+    } catch (e) {
+      console.warn('Google Translate widget not ready, using built-in local fallback engine.', e);
+    }
+  }
+
   if (DOM.translateTopicBtn) {
     DOM.translateTopicBtn.addEventListener('click', () => {
       if (!state.activeTopic) return;
       const topicId = state.activeTopic.id;
       const currentLang = state.activeLanguage[topicId] || state.globalLanguage || 'en';
-      state.activeLanguage[topicId] = currentLang === 'fil' ? 'en' : 'fil';
+      const newLang = currentLang === 'fil' ? 'en' : 'fil';
+      state.activeLanguage[topicId] = newLang;
+      triggerGoogleTranslate(newLang);
       openTopicModal(topicId);
     });
   }
@@ -699,6 +713,8 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.globalTranslateLabel.textContent = isFil ? 'Naka-Filipino' : 'EN / FIL';
       }
       
+      triggerGoogleTranslate(state.globalLanguage);
+
       // Sync active topic modal language if currently open
       if (state.activeTopic) {
         state.activeLanguage[state.activeTopic.id] = state.globalLanguage;

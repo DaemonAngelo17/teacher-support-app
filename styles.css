@@ -1865,3 +1865,26 @@ a {
   transform: translateY(-1px);
 }
 
+/* Google Translate Widget UI Overrides */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+.goog-te-spinner-pos {
+  display: none !important;
+}
+
+#goog-gt-tt {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
