@@ -23,7 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     saveTimeout: null,
     
     // Custom Confirm Callback
-    onConfirmCallback: null
+    onConfirmCallback: null,
+
+    // Active Language per topic ('en' | 'fil')
+    activeLanguage: {}
   };
 
   // ==========================================
@@ -59,6 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     modalGradeBadge: document.getElementById('modal-grade-badge'),
     modalTopicTitle: document.getElementById('modal-topic-title'),
     modalTopicDescription: document.getElementById('modal-topic-description'),
+    translateTopicBtn: document.getElementById('translate-topic-btn'),
+    translateBtnLabel: document.getElementById('translate-btn-label'),
     tabButtons: document.querySelectorAll('.tab-btn'),
     tabPanes: document.querySelectorAll('.tab-pane'),
     
@@ -433,8 +438,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="badge ${topic.subject}">${subjectLabelMap[topic.subject]}</span>
           <span class="grade-tag">Grade ${topic.grade}</span>
         </div>
-        <h3>${escapeHTML(topic.topic)}</h3>
-        <p class="card-description">${escapeHTML(topic.description)}</p>
+        <h3>${renderMathEquations(topic.topic)}</h3>
+        <p class="card-description">${renderMathEquations(topic.description)}</p>
         <div class="card-footer">
           <span class="card-resources-indicator" title="Lesson resources available">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -474,6 +479,111 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
+  // MATH EQUATIONS RENDERER & TRANSLATION ENGINE
+  // ==========================================
+
+  function renderMathEquations(text) {
+    if (!text || typeof text !== 'string') return text || '';
+
+    let formatted = escapeHTML(text);
+
+    // Exponents & Superscripts: e.g. x^2, r^2, x², r², a³, (x-h)²
+    formatted = formatted.replace(/(\b[a-zA-Z0-9\)]+)\^([a-zA-Z0-9\+\-]+)/g, '$1<sup>$2</sup>');
+    formatted = formatted.replace(/([a-zA-Z0-9\)])[²]/g, '$1<sup>2</sup>');
+    formatted = formatted.replace(/([a-zA-Z0-9\)])[³]/g, '$1<sup>3</sup>');
+
+    // Subscripts: e.g. x_1, P_1, V_1
+    formatted = formatted.replace(/(\b[a-zA-Z0-9]+)_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>');
+
+    // Square roots: e.g. sqrt(x), √x
+    formatted = formatted.replace(/sqrt\((.*?)\)/gi, '<span class="math-sqrt">&radic;<span class="sqrt-stem">$1</span></span>');
+    formatted = formatted.replace(/√\((.*?)\)/g, '<span class="math-sqrt">&radic;<span class="sqrt-stem">$1</span></span>');
+    formatted = formatted.replace(/√([a-zA-Z0-9]+)/g, '<span class="math-sqrt">&radic;<span class="sqrt-stem">$1</span></span>');
+
+    // Fractions: e.g. 1/2, 1/3, 1/4, 3/4, 2/3, 1/5, 1/8
+    formatted = formatted.replace(/(\b\d+)\/(\d+\b)/g, '<span class="math-frac"><span class="num">$1</span><span class="den">$2</span></span>');
+
+    // Greek symbols & Math Operators
+    formatted = formatted.replace(/\bpi\b/gi, '&pi;');
+    formatted = formatted.replace(/π/g, '&pi;');
+    formatted = formatted.replace(/±/g, '&plusmn;');
+    formatted = formatted.replace(/≥/g, '&ge;');
+    formatted = formatted.replace(/≤/g, '&le;');
+    formatted = formatted.replace(/≠/g, '&ne;');
+    formatted = formatted.replace(/°/g, '&deg;');
+
+    // Wrap equations in math-expr wrapper if math symbols exist
+    if (/[\=\^√π±≥≤≠]|<sup>|<sub>|<span class="math-/.test(formatted)) {
+      return `<span class="math-expr">${formatted}</span>`;
+    }
+
+    return formatted;
+  }
+
+  const translationDict = {
+    // Subject mapping
+    "Pangngalan": "Noun (Ngalan ng Tao, Bagay, Hayop, Lugar, Pangyayari)",
+    "Panghalip Panao": "Personal Pronouns (Ako, Ikaw, Siya, Kami, Tayo, Sila)",
+    "Pandiwa": "Verbs / Action Words (Kilos o Gawa)",
+    "Pang-uri": "Adjectives (Salitang Naglalarawan)",
+    "Pang-abay": "Adverbs (Naglalarawan sa Pandiwa o Pang-uri)",
+    "Simuno at Panaguri": "Subject and Predicate",
+    "Ako at ang Aking Sarili": "Myself and My Personal Identity",
+    "Ang Lalawigan at Rehiyon": "My Province and Region",
+    "Likas na Yaman": "Natural Resources & Conservation",
+    "Sinaunang Lipunang Pilipino": "Ancient Philippine Society & Culture",
+    "Kolonyalismong Espanyol": "Spanish Colonial Period & Christianization",
+    "Himagsikang Pilipino": "The Philippine Revolution of 1896",
+    "Araling Asyano": "Asian Studies & Geography",
+    "Kasaysayan ng Daigdig": "World History & Ancient Civilizations",
+    "Ekonomiks": "Economics & Resource Allocation",
+    "Mga Kontemporaryong Isyu": "Contemporary Global & Local Issues",
+    "Ibong Adarna": "Ibong Adarna (Philippine Epic)",
+    "Florante at Laura": "Florante at Laura (Classic Epic Poem)",
+    "Noli Me Tangere": "Noli Me Tangere (Touch Me Not - Jose Rizal)",
+    "El Filibusterismo": "El Filibusterismo (The Reign of Greed)",
+    "Komunikasyon at Pananaliksik": "Communication and Research in Filipino",
+    "Pagbasa at Pagsusuri": "Reading and Critical Analysis of Texts"
+  };
+
+  function translateText(text, targetLang) {
+    if (!text || typeof text !== 'string') return text || '';
+    
+    if (targetLang === 'fil') {
+      let res = text
+        .replace(/Understand the main principles of (.*)\./i, 'Unawain ang mga pangunahing alituntunin at konsepto ng $1.')
+        .replace(/Study and explore the learning objectives of (.*)\./i, 'Aralin at suriin ang mga layunin sa pagkakatuto ng $1.')
+        .replace(/What is the key objective of studying: (.*)\?/i, 'Ano ang pangunahing layunin sa pag-aaral ng $1?')
+        .replace(/True or False: This topic is a core standard for (.*)\./i, 'Tama o Mali: Ang paksang ito ay isang batayang pamantayan sa $1.')
+        .replace(/Name an important detail or term related to this topic\./i, 'Magbigay ng isang mahalagang detalye o katawagan kaugnay ng paksang ito.')
+        .replace(/To gain structural understanding and list core functions of: (.*)\./i, 'Upang magkaroon ng pag-unawa sa estruktura at maiisa-isa ang mga tungkulin ng $1.')
+        .replace(/True\. It matches curriculum criteria\./i, 'Tama. Ito ay umaayon sa pamantayan ng kurikulum.')
+        .replace(/Yes, a key detail is: (.*)\./i, 'Oo, ang isang mahalagang detalye ay: $1.');
+      return res;
+    } else {
+      let res = text;
+      for (const [key, val] of Object.entries(translationDict)) {
+        if (res.includes(key)) {
+          res = res.replaceAll(key, val);
+        }
+      }
+      res = res
+        .replace(/Suriin ang (.*)/g, 'Analyze and study $1')
+        .replace(/Tukuyin ang (.*)/g, 'Identify and describe $1')
+        .replace(/Matukoy ang (.*)/g, 'Determine and examine $1')
+        .replace(/Unawain ang (.*)/g, 'Understand the concepts of $1')
+        .replace(/Talakayin ang (.*)/g, 'Discuss and explore $1')
+        .replace(/Pagkilala sa (.*)/g, 'Recognition of $1')
+        .replace(/Paggamit ng (.*)/g, 'Use and application of $1')
+        .replace(/Pangangalaga sa (.*)/g, 'Care and conservation of $1')
+        .replace(/Wastong (.*)/g, 'Proper $1')
+        .replace(/Mga Katangian ng (.*)/g, 'Characteristics of $1')
+        .replace(/Kahalagahan ng (.*)/g, 'Importance of $1');
+      return res;
+    }
+  }
+
+  // ==========================================
   // MODAL / DRAWER MANAGEMENT
   // ==========================================
   
@@ -483,9 +593,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     state.activeTopic = topic;
 
-    // Set topic titles and descriptions
-    DOM.modalTopicTitle.innerText = topic.topic;
-    DOM.modalTopicDescription.innerText = topic.description;
+    const activeLang = state.activeLanguage[topicId] || 'en';
+    if (DOM.translateBtnLabel) {
+      DOM.translateBtnLabel.textContent = activeLang === 'fil' ? 'Naka-Filipino' : 'EN / FIL';
+    }
+
+    const titleText = translateText(topic.topic, activeLang);
+    const descText = translateText(topic.description, activeLang);
+
+    // Set topic titles and descriptions with math equations and translation
+    DOM.modalTopicTitle.innerHTML = renderMathEquations(titleText);
+    DOM.modalTopicDescription.innerHTML = renderMathEquations(descText);
     
     // Set Header Banner Subject Styling
     DOM.modalHeaderBanner.className = 'modal-header'; // reset
@@ -508,7 +626,8 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.modalConceptList.innerHTML = '';
     topic.coreConcepts.forEach(concept => {
       const li = document.createElement('li');
-      li.innerText = concept;
+      const translatedConcept = translateText(concept, activeLang);
+      li.innerHTML = renderMathEquations(translatedConcept);
       DOM.modalConceptList.appendChild(li);
     });
 
@@ -553,6 +672,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   DOM.closeModalBtn.addEventListener('click', closeModal);
+
+  if (DOM.translateTopicBtn) {
+    DOM.translateTopicBtn.addEventListener('click', () => {
+      if (!state.activeTopic) return;
+      const topicId = state.activeTopic.id;
+      const currentLang = state.activeLanguage[topicId] || 'en';
+      state.activeLanguage[topicId] = currentLang === 'fil' ? 'en' : 'fil';
+      openTopicModal(topicId);
+    });
+  }
   
   DOM.detailModal.addEventListener('click', (e) => {
     // Close modal if user clicks the blurred backdrop overlay directly
@@ -740,11 +869,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const item = items[state.currentCardIndex];
     DOM.flashcardElement.classList.remove('flipped');
     
+    const activeLang = (state.activeTopic ? state.activeLanguage[state.activeTopic.id] : 'en') || 'en';
+
     // Allow brief sync before changing content to make flip animations smooth
     setTimeout(() => {
       DOM.flashcardNum.innerText = state.currentCardIndex + 1;
-      DOM.flashcardQText.innerText = item.question;
-      DOM.flashcardAText.innerText = item.answer;
+      DOM.flashcardQText.innerHTML = renderMathEquations(translateText(item.question, activeLang));
+      DOM.flashcardAText.innerHTML = renderMathEquations(translateText(item.answer, activeLang));
       DOM.currCardIndex.innerText = state.currentCardIndex + 1;
     }, 150);
 
@@ -887,9 +1018,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateQuizQuestion() {
     const items = state.activeTopic.reviewItems;
     const item = items[state.currentQuizIndex];
+    const activeLang = (state.activeTopic ? state.activeLanguage[state.activeTopic.id] : 'en') || 'en';
     
     DOM.quizCurrQNum.innerText = state.currentQuizIndex + 1;
-    DOM.quizQuestionTextEl.innerText = item.question;
+    DOM.quizQuestionTextEl.innerHTML = renderMathEquations(translateText(item.question, activeLang));
     
     // Reset answers visibility
     DOM.quizAnswerBlock.style.display = 'none';
@@ -904,7 +1036,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (DOM.quizBtnReveal) {
     DOM.quizBtnReveal.addEventListener('click', () => {
       const item = state.activeTopic.reviewItems[state.currentQuizIndex];
-      DOM.quizAnswerTextEl.innerText = item.answer;
+      const activeLang = (state.activeTopic ? state.activeLanguage[state.activeTopic.id] : 'en') || 'en';
+      DOM.quizAnswerTextEl.innerHTML = renderMathEquations(translateText(item.answer, activeLang));
       DOM.quizAnswerBlock.style.display = 'flex';
       DOM.quizBtnReveal.style.display = 'none';
     });

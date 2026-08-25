@@ -1780,3 +1780,88 @@ a {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
+
+/* ==========================================
+   MATH EQUATION TYPOGRAPHY & TRANSLATION STYLES
+   ========================================== */
+.math-expr {
+  font-family: "Cambria Math", "Latin Modern Math", "STIX Two Math", "Times New Roman", serif;
+  font-size: 1.05em;
+  color: var(--text-primary);
+  background: rgba(37, 99, 235, 0.07);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+[data-theme="dark"] .math-expr {
+  background: rgba(96, 165, 250, 0.14);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+.math-var {
+  font-style: italic;
+  font-family: "Cambria Math", "Times New Roman", serif;
+  padding: 0 1px;
+}
+
+.math-num {
+  font-style: normal;
+  font-family: inherit;
+}
+
+.math-frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 0.85em;
+  line-height: 1.1;
+  padding: 0 3px;
+}
+
+.math-frac .num {
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 1px;
+}
+
+.math-frac .den {
+  padding-top: 1px;
+}
+
+.math-sqrt {
+  display: inline-flex;
+  align-items: center;
+}
+
+.math-sqrt .sqrt-stem {
+  border-top: 1.5px solid currentColor;
+  padding-left: 2px;
+  padding-right: 2px;
+  margin-left: 1px;
+}
+
+.translation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  margin-left: 8px;
+}
+
+.text-badge-btn:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-1px);
+}
+
