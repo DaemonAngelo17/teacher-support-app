@@ -26,7 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     onConfirmCallback: null,
 
     // Active Language per topic ('en' | 'fil')
-    activeLanguage: {}
+    activeLanguage: {},
+
+    // Global Language toggle ('en' | 'fil')
+    globalLanguage: 'en'
   };
 
   // ==========================================
@@ -117,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
     addTopicBtn: document.getElementById('add-topic-btn'),
     resetCurriculumBtn: document.getElementById('reset-curriculum-btn'),
     resetCurriculumHeaderBtn: document.getElementById('reset-curriculum-header-btn'),
+    globalTranslateBtn: document.getElementById('global-translate-btn'),
+    globalTranslateLabel: document.getElementById('global-translate-label'),
     editTopicBtn: document.getElementById('edit-topic-btn'),
 
     // Form Modal Elements
@@ -433,13 +438,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const resourcesCount = (topic.resources ? topic.resources.length : 0) + parsedLinks.length;
 
+      const cardTitle = translateText(topic.topic, state.globalLanguage);
+      const cardDesc = translateText(topic.description, state.globalLanguage);
+
       card.innerHTML = `
         <div class="card-meta">
           <span class="badge ${topic.subject}">${subjectLabelMap[topic.subject]}</span>
           <span class="grade-tag">Grade ${topic.grade}</span>
         </div>
-        <h3>${renderMathEquations(topic.topic)}</h3>
-        <p class="card-description">${renderMathEquations(topic.description)}</p>
+        <h3>${renderMathEquations(cardTitle)}</h3>
+        <p class="card-description">${renderMathEquations(cardDesc)}</p>
         <div class="card-footer">
           <span class="card-resources-indicator" title="Lesson resources available">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -677,9 +685,27 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.translateTopicBtn.addEventListener('click', () => {
       if (!state.activeTopic) return;
       const topicId = state.activeTopic.id;
-      const currentLang = state.activeLanguage[topicId] || 'en';
+      const currentLang = state.activeLanguage[topicId] || state.globalLanguage || 'en';
       state.activeLanguage[topicId] = currentLang === 'fil' ? 'en' : 'fil';
       openTopicModal(topicId);
+    });
+  }
+
+  if (DOM.globalTranslateBtn) {
+    DOM.globalTranslateBtn.addEventListener('click', () => {
+      state.globalLanguage = state.globalLanguage === 'fil' ? 'en' : 'fil';
+      const isFil = state.globalLanguage === 'fil';
+      if (DOM.globalTranslateLabel) {
+        DOM.globalTranslateLabel.textContent = isFil ? 'Naka-Filipino' : 'EN / FIL';
+      }
+      
+      // Sync active topic modal language if currently open
+      if (state.activeTopic) {
+        state.activeLanguage[state.activeTopic.id] = state.globalLanguage;
+        openTopicModal(state.activeTopic.id);
+      }
+      
+      updateFilterStatusAndRender();
     });
   }
   
